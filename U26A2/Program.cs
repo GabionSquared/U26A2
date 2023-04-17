@@ -4,7 +4,10 @@ using System.Linq;
 
 class Program
 {
-    static List<Department> AllDepartments;
+
+    //OOP is overrated.
+
+    static List<Course> AllCourses;
     static List<Student> AllStudents;
 
     #region Structs
@@ -13,20 +16,29 @@ class Program
         public string Forename;
         public string Lastname;
         public int ID;
-        public int contactNumber;
-        public List<Department> EnrolledDepartments;
+        public long contactNumber; //this is exclusivley so findstudent could be seperate
+        public List<Course> EnrolledCourses;
     }
 
-    struct Department
+    struct Course
     {
-        public string DepartmentName;
+        public string CourseName;
         public List<Student> Students;
     }
     #endregion
 
     static void Main(string[] args)
     {
-        AllDepartments = new List<Department>();
+        Console.Write(
+        @"  _____  ______ _____    _______     _______ _______ ______ __  __ " + "\n" +
+        @" |  __ \|  ____/ ____|  / ____\ \   / / ____|__   __|  ____|  \/  |" + "\n" +
+        @" | |__) | |__ | |  __  | (___  \ \_/ / (___    | |  | |__  | \  / |" + "\n" +
+        @" |  _  /|  __|| | |_ |  \___ \  \   / \___ \   | |  |  __| | |\/| |" + "\n" +
+        @" | | \ \| |___| |__| |  ____) |  | |  ____) |  | |  | |____| |  | |" + "\n" +
+        @" |_|  \_\______\_____| |_____/   |_| |_____/   |_|  |______|_|  |_|" + "\n\n"
+        );
+
+        AllCourses = new List<Course>();
         AllStudents = new List<Student>();
 
         GenerateTestInformation();
@@ -39,23 +51,24 @@ class Program
 
     static void GenerateTestInformation()
     {
-        NewDepartment("Maths");
-        NewDepartment("Science");
-        NewDepartment("English");
+        NewCourse("ERROR");
+        NewCourse("Maths");
+        NewCourse("Science");
+        NewCourse("English");
+
+        Student s = new Student();
+        s.Forename = "Jimmy";
+        s.Lastname = "Johnson";
+        s.ID = 40139037;
+        s.contactNumber = 02084220909;
+        s.EnrolledCourses = new List<Course>();
+        EnrollStudent(s, "Maths");
     }
 
     static void MainMenu()
     {
-        Console.Write(
-        @"  _____  ______ _____    _______     _______ _______ ______ __  __ " + "\n" +
-        @" |  __ \|  ____/ ____|  / ____\ \   / / ____|__   __|  ____|  \/  |" + "\n" +
-        @" | |__) | |__ | |  __  | (___  \ \_/ / (___    | |  | |__  | \  / |" + "\n" +
-        @" |  _  /|  __|| | |_ |  \___ \  \   / \___ \   | |  |  __| | |\/| |" + "\n" +
-        @" | | \ \| |___| |__| |  ____) |  | |  ____) |  | |  | |____| |  | |" + "\n" +
-        @" |_|  \_\______\_____| |_____/   |_| |_____/   |_|  |______|_|  |_|" + "\n\n"
-        );
         //https://patorjk.com/software/taag/#p=display&f=Big&t=REG%20SYSTEM
-        Console.WriteLine(
+        Scroll(
             "\n\t1) View All Courses" +
             "\n\t2) Search For Student" + //phone, id or course name
             "\n\t3) Display All Students From Course" + //"-	Display all student IDs, first names, last names, based on course" 
@@ -63,17 +76,7 @@ class Program
             "\n\t5) Update Student Record" +
             "\n\t6) Exit");
 
-        string _input = "";
-        bool inputFlag = false;
-            
-        while (!inputFlag)
-        {
-            Console.Write("\n\t> ");
-            _input = Console.ReadLine();
-            inputFlag = ValidateIntInput(_input, 1, 6);
-
-        }
-        int input = int.Parse(_input);
+        int input = SafeIntInput(">", 1, 6);
 
         switch (input) 
         {
@@ -81,7 +84,7 @@ class Program
             DisplayAllCourses();
             break;
           case 2: //Search for student (phone, id or course name)
-            Console.WriteLine("Tuesday");
+            FindStudentMenu();
             break;
           case 3: //Display all students from course (IDs, first names, last names)
             Console.WriteLine("Wednesday");
@@ -98,13 +101,13 @@ class Program
         }
     }
 
-    static Department NewDepartment(string name)
+    static Course NewCourse(string name)
     {
-        Department newD = new Department();
-        newD.DepartmentName = name;
+        Course newD = new Course();
+        newD.CourseName = name;
         newD.Students = new List<Student>();
 
-        AllDepartments.Add(newD);
+        AllCourses.Add(newD);
 
         return newD;
     }
@@ -151,6 +154,122 @@ class Program
         return newS;
     }
 
+    #region Student Utils
+    static void EnrollStudent(Student s, string course)
+    {
+        Course d = FindCourseByName(course);
+        s.EnrolledCourses.Add(d);
+        d.Students.Add(s);
+    }
+
+    static void DisplayStudent(Student s)
+    {
+        Console.WriteLine("----------------------");
+        Scroll(s.Forename + " " + s.Lastname);
+        Scroll(s.ID.ToString());
+        Scroll(s.contactNumber.ToString());
+        Scroll("Enrolled Courses:");
+
+
+        Scroll(s.ID.ToString());
+
+        if (s.EnrolledCourses.Count == 0)
+        {
+            Scroll("(None found)");
+        }
+        else
+        {
+            foreach (var Course in s.EnrolledCourses)
+            {
+                Scroll("- " + Course.CourseName, finishTime: 0);
+            }
+        }
+        Console.WriteLine("----------------------");
+    }
+    #endregion
+
+    #region Course Utils
+    static Course FindCourseByName(string course)
+    {
+        foreach (var Course in AllCourses)
+        {
+            try
+            {
+                if (Course.CourseName.ToLower() == course.ToLower())
+                {
+                    return Course;
+                }
+            }
+            catch
+            {
+                Console.WriteLine("that course does not exist.");
+            }
+        }
+        return FindCourseByName("ERROR");
+    }
+
+    static void AllStudentsInCourse(Course c)
+    {
+        foreach (var Student in c.Students)
+        {
+            DisplayStudent(Student);
+        }
+    }
+
+    static void DisplayAllCourses()
+    {
+        Console.WriteLine();
+        foreach (var Course in AllCourses)
+        {
+            Scroll("- " + Course.CourseName, finishTime: 0);
+        }
+    }
+    #endregion
+
+    #region Generic Utils
+
+    static int SafeIntInput(string prompt = ">", int? lower = null, int? upper = null)
+    {
+        string input = "";
+        bool inputFlag = false;
+
+        while (!inputFlag)
+        {
+            Console.Write("\n\t" + prompt);
+            input = Console.ReadLine();
+            inputFlag = ValidateIntInput(input, lower, upper);
+
+        }
+        return int.Parse(input);
+    }
+
+    //this function has served me 6 years and it'll do 6 years more. UX is king.
+    /// <summary>
+    /// For making strings print one character at a time
+    /// </summary>
+    /// <param name="msg">The string that will be printed.<para>does not work with the "value: {0}",var method, use "value: "+var</para></param>
+    /// <param name="scrollTime">Time between each character being printed in thousands of a second.</param>
+    /// <param name="finishTime">Time after the string is finished in thousands of a second.</param>
+    /// <param name="lineBreak">How many times \n is sent AFTER msg</param>
+    /// <param name="tabs">How many times \t is sent BEFORE msg</param>
+    public static void Scroll(string msg, int scrollTime = 10, int finishTime = 500, int lineBreak = 1, int tabs = 1)
+    {
+        for (int i = 0; i < tabs; i++)
+        { //do the tabs
+            Console.Write("\t");
+        }
+        for (int i = 0; i < msg.Length; i++)
+        { //print the message
+            System.Threading.Thread.Sleep(scrollTime);
+            Console.Write(msg[i]);
+        }
+        for (int i = 0; i < lineBreak; i++)
+        { //do the line breaks
+            Console.Write("\n");
+        }
+        System.Threading.Thread.Sleep(finishTime); //end sleep
+    }
+    #endregion
     #region Validations (string, int, phone number, range)
     //returns true when passing the check successfully
 
@@ -230,46 +349,61 @@ class Program
     }
     #endregion
 
-    static void DisplayAllCourses()
+    static void FindStudentMenu()
     {
-        foreach (var Course in AllDepartments)
+        Scroll("Find From:");
+        Scroll(
+        "\n\t1) ID" +
+        "\n\t2) Phone Number" +
+        "\n\t3) Course Name"
+        );
+
+        int input = SafeIntInput("> ", 1, 3);
+
+        switch (input)
         {
-            Console.WriteLine("- " + Course.DepartmentName);
+            case 1: //ID
+                FindStudent(SafeIntInput("ID: ", 10000000, 99999999));
+                break;
+            case 2: //Phone Number
+                //FindStudent(Convert.ToInt64(SafeIntInput("ID: ", 1000000000, 9999999999)));
+                break;
+            case 3: //Course Name
+                //Console.WriteLine("Wednesday");
+                break;
         }
     }
 
-    static void FindStudent()
+    #region Find Student
+
+    static void FindStudent(int ID)
     {
-
+        foreach (var Student in AllStudents)
+        {
+            if (ID == Student.ID)
+            {
+                DisplayStudent(Student);
+            }
+        }
     }
-
-
-    //this function has served me 6 years and it'll do 6 years more. UX is king.
-    /// <summary>
-    /// For making strings print one character at a time
-    /// </summary>
-    /// <param name="msg">The string that will be printed.<para>does not work with the "value: {0}",var method, use "value: "+var</para></param>
-    /// <param name="scrollTime">Time between each character being printed in thousands of a second.</param>
-    /// <param name="finishTime">Time after the string is finished in thousands of a second.</param>
-    /// <param name="lineBreak">How many times \n is sent AFTER msg</param>
-    /// <param name="tabs">How many times \t is sent BEFORE msg</param>
-    public static void Scroll(string msg, int scrollTime = 30, int finishTime = 1000, int lineBreak = 1, int tabs = 1)
+    static void FindStudent(long contactNumber)
     {
-        for (int i = 0; i < tabs; i++)
-        { //do the tabs
-            Console.Write("\t");
+        foreach (var Student in AllStudents)
+        {
+            if (contactNumber == Student.contactNumber)
+            {
+                DisplayStudent(Student);
+            }
         }
-        for (int i = 0; i < msg.Length; i++)
-        { //print the message
-            System.Threading.Thread.Sleep(scrollTime);
-            Console.Write(msg[i]);
-        }
-        for (int i = 0; i < lineBreak; i++)
-        { //do the line breaks
-            Console.Write("\n");
-        }
-        System.Threading.Thread.Sleep(finishTime); //end sleep
     }
+
+    static void FindStudent(string courseName)
+    {
+        Course d = FindCourseByName(courseName);
+        AllStudentsInCourse(d);
+    }
+
+    #endregion
 }
 
 /*

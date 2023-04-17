@@ -149,8 +149,76 @@ class Program
             "\n\t3) Display all students from course" + //"-	Display all student IDs, first names, last names, based on course" 
             "\n\t4) Delete student record" +
             "\n\t5) Update student record");
+
+        string _input = "";
+        bool inputFlag = false;
+
+        while (!inputFlag)
+        {
+            Console.WriteLine("Forename:    ");
+            _input = Console.ReadLine();
+            inputFlag = ValidateIntInput(_input);
+        }
+        int input = int.Parse(_input);
     }
 
 }
 
 //https://patorjk.com/software/taag/#p=display&f=Big&t=REG%20SYSTEM
+
+/*
+blockchain
+ made by a mathmetician from the 70s
+ legers, 1st and 2nd branches
+ magic hashes verifying eachother
+ money laundering (monero)
+
+ literally the whole point of crypto is hiding income (not tax evasion trust me)
+
+5g
+ 4g but faster
+ iot
+ hacking peoples doorbel
+ "smart microwave"
+  cognative dissonance
+   programmers knows it's wank
+   regular people slurp it up
+   botnet
+   hackers go brr
+
+quantum
+ a model of comuting ivented by (dead) richard feynman et al, promising to use superposed entanglement between cubits (subatomic)
+ deomstrated in a lab, theoretical physisits ate it up
+ logic gates to control interactions -> computer?
+ usually phosperous & silicon because of resonance and other magic
+ need billions, can actually do barely 20
+ THEORISTS can use it to sort list
+ fourier transform (specialist engineering shit)
+ peter schwarz says a working quantum computer could do semi-prime factorisation, semi-descreet (?) SIGNIFICANTLY FASTER than regular computers
+ comprimise significant amounts of other garbage 
+ biochemistry would benifit massivley from huge sorting
+ hadamard gates?
+ gordon moore
+ if you lose track of the cubits the algorithm just stops
+
+ai
+ 3rd gen neural net
+ recursive neural net (long-short term memory)
+ 2016-2017 it got better (trasformative neural net) qualitive nodes
+  everything caught fire
+  generally learns much faster than long-short
+ biocomputing
+ cybersecurity
+ chinese room thought experiment
+ tesla archetecture
+
+ protien folding problem
+  predicting the shape of a protien by it's formula
+  stuck on long-short memory
+  went from 20 -> 90%
+  US medical lobbying is 725.1 million USD (Statistica, 2022)
+
+
+
+
+*/

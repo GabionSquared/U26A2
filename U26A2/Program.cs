@@ -2,12 +2,28 @@
 using System.Collections.Generic;
 using System.Linq;
 
+/*Reqs
+
+-	Add new student
+-	Add new department
+    -	3 already present:
+        -	Business
+        -	Health care
+        -	Computing
+-	Remove student record via ID or phone number
+-	Search student record based on phone number, id, or course name (string? IEnum?)
+-	Display all student IDs, first names, last names, based on course
+-	Update student details
+
+
+*/
+
+//Tools > NuGet Package Manager > Package Manager Console
+//dotnet restore
+
 class Program
 {
-
-    //OOP is overrated.
-
-    static List<Course> AllCourses;
+    static List<Department> AllDepartments;
     static List<Student> AllStudents;
 
     #region Structs
@@ -16,7 +32,7 @@ class Program
         public string Forename;
         public string Lastname;
         public int ID;
-        public long contactNumber; //this is exclusivley so findstudent could be seperate
+        public int contactNumber;
         public List<Course> EnrolledCourses;
     }
 
@@ -27,42 +43,31 @@ class Program
     }
     #endregion
 
-    static void Main(string[] args)
+    static void Main()
     {
-        Console.Write(
-        @"  _____  ______ _____    _______     _______ _______ ______ __  __ " + "\n" +
-        @" |  __ \|  ____/ ____|  / ____\ \   / / ____|__   __|  ____|  \/  |" + "\n" +
-        @" | |__) | |__ | |  __  | (___  \ \_/ / (___    | |  | |__  | \  / |" + "\n" +
-        @" |  _  /|  __|| | |_ |  \___ \  \   / \___ \   | |  |  __| | |\/| |" + "\n" +
-        @" | | \ \| |___| |__| |  ____) |  | |  ____) |  | |  | |____| |  | |" + "\n" +
-        @" |_|  \_\______\_____| |_____/   |_| |_____/   |_|  |______|_|  |_|" + "\n\n"
-        );
-
-        AllCourses = new List<Course>();
+        AllDepartments = new List<Department>();
         AllStudents = new List<Student>();
 
-        GenerateTestInformation();
-
-        while (true)
-        {
-            MainMenu();
-        }
+        MainMenu();
     }
 
     static void GenerateTestInformation()
     {
         NewCourse("ERROR");
-        NewCourse("Maths");
-        NewCourse("Science");
-        NewCourse("English");
+        NewCourse("Business");
+        NewCourse("Health Care");
+        NewCourse("Computing");
 
-        Student s = new Student();
-        s.Forename = "Jimmy";
-        s.Lastname = "Johnson";
-        s.ID = 40139037;
-        s.contactNumber = 02084220909;
-        s.EnrolledCourses = new List<Course>();
-        EnrollStudent(s, "Maths");
+        Student s = new()
+        {
+            Forename = "Jimmy",
+            Lastname = "Johnson",
+            ID = 40139037,
+            contactNumber = 02084220909,
+            EnrolledCourses = new List<Course>()
+        };
+
+        EnrollStudent(s, "Computing");
     }
 
     static void MainMenu()
@@ -72,54 +77,64 @@ class Program
             "\n\t1) View All Courses" +
             "\n\t2) Search For Student" + //phone, id or course name
             "\n\t3) Display All Students From Course" + //"-	Display all student IDs, first names, last names, based on course" 
-            "\n\t4) Delete Student Record" +
-            "\n\t5) Update Student Record" +
-            "\n\t6) Exit");
+            "\n\t4) Add Student Record" +
+            "\n\t5) Delete Student Record" +
+            "\n\t6) Update Student Record" +
+            "\n\t7) Exit");
 
         int input = SafeIntInput(">", 1, 6);
 
         switch (input) 
         {
-          case 1: //View all courses
-            DisplayAllCourses();
-            break;
-          case 2: //Search for student (phone, id or course name)
-            FindStudentMenu();
-            break;
-          case 3: //Display all students from course (IDs, first names, last names)
-            Console.WriteLine("Wednesday");
-            break;
-          case 4: //Delete student record
-            Console.WriteLine("Thursday");
-            break;
-          case 5: //Update student record
-            Console.WriteLine("Friday");
-            break;
-          case 6: //Exit
-            Environment.Exit(0);
-            break;
+            case 1: //View all courses
+                DisplayAllCourses();
+                break;
+            case 2: //Search for student (phone, id or course name)
+                FindStudentMenu();
+                break;
+            case 3: //Display all students from course (IDs, first names, last names)
+                Console.WriteLine("Wednesday");
+                break;
+            case 4: //Add student record
+                NewStudent();
+                break;
+            case 5: //Delete student record
+                Console.WriteLine("Thursday");
+                break;
+            case 6: //Update student record
+                Console.WriteLine("Friday");
+                break;
+            case 7: //Exit
+                Environment.Exit(0);
+                break;
         }
     }
 
+    //technical
     static Course NewCourse(string name)
     {
-        Course newD = new Course();
-        newD.CourseName = name;
-        newD.Students = new List<Student>();
+        Course newD = new()
+        {
+            CourseName = name,
+            Students = new List<Student>(),
+        };
 
         AllCourses.Add(newD);
 
         return newD;
     }
+
+    //graphical
     static Student NewStudent()
     {
-        Student newS = new Student();
+        Student newS = new();
         string input = "";
 
         bool Flag_Forename = false;
         bool Flag_Lastname = false;
         bool Flag_ID = false;
         bool Flag_ContactNumber = false;
+        bool Flag_Course = false;
 
         while (!Flag_Forename) {
             Console.WriteLine("Forename:    ");
@@ -136,14 +151,14 @@ class Program
         newS.Lastname = input;
 
         while (!Flag_ID) {
-            Console.WriteLine("ID:    ");
+            Console.WriteLine("Forename:    ");
             input = Console.ReadLine();
-            Flag_ID = ValidateIntInput(input, 10000000, 99999999);
+            Flag_ID = ValidateIntInput(input);
         }
         newS.ID = int.Parse(input);
 
         while (!Flag_ContactNumber) {
-            Console.WriteLine("Contact Number:    ");
+            Console.WriteLine("Forename:    ");
             input = Console.ReadLine();
             Flag_ContactNumber = ValidatePhoneNumberInput(input);
         }
@@ -151,8 +166,32 @@ class Program
 
         //TODO a loop for adding courses to the student
 
+        while (!Flag_Course)
+        {
+            Console.WriteLine("(Type NaN to exit)");
+            Console.WriteLine("Course Name:    ");
+            input = Console.ReadLine();
+            Flag_ContactNumber = ValidateStringInput(input);
+
+            if (input == "NaN")
+            {
+                Flag_Course = true;
+            }
+            else
+            {
+                try
+                {
+                    EnrollStudent(newS, input);
+                }
+                catch
+                {
+                    Console.WriteLine("Course not found");
+                }
+            }
+        }
         return newS;
     }
+
 
     #region Student Utils
     static void EnrollStudent(Student s, string course)
@@ -277,13 +316,11 @@ class Program
     {
         if (string.IsNullOrEmpty(input))
         {
-            System.Diagnostics.Debug.WriteLine("String Validation Failed (Empty)");
             return false;
         }
 
-        if (input.Contains(" "))
+        if (input.Contains(' '))
         {
-            System.Diagnostics.Debug.WriteLine("String Validation Failed (Contains Whitespace)");
             return false;
         }
 
@@ -291,46 +328,34 @@ class Program
         {
             if (!char.IsLetter(c))
             {
-                System.Diagnostics.Debug.WriteLine("String Validation Failed (Contains Non-Letter Characters)");
                 return false;
             }
         }
-        System.Diagnostics.Debug.WriteLine("String Validation Passed");
+
         return true;
     }
-
-    //snuck in a range check. doing it in here because it's an easily accessable version of input already cleaned as int.
-    static bool ValidateIntInput(string input, int? lower = null, int? upper = null)
+    static bool ValidateIntInput(string input)
     {
         if (string.IsNullOrEmpty(input))
         {
-            System.Diagnostics.Debug.WriteLine("Int Validation Failed (Empty)");
             return false;
         }
 
         if (int.TryParse(input, out int result))
         {
-            if (!(upper == null && lower == null)) //this can absolutly be simplified
+            // faster than counting the characters dont @ me (for an int)
+            if (result >= 10000000 && result <= 99999999)
             {
-                if(result >= lower && result <= upper)
-                {
-                    System.Diagnostics.Debug.WriteLine("Int & Range Validation Passed");
-                    return true;
-                }
-                System.Diagnostics.Debug.WriteLine("Int & Range Validation Failed");
-                return false;
+                return true;
             }
-            System.Diagnostics.Debug.WriteLine("Int Validation Passed");
-            return true;
         }
-        System.Diagnostics.Debug.WriteLine("Int Validation Failed");
+
         return false;
     }
     static bool ValidatePhoneNumberInput(string input)
     {
         if (string.IsNullOrEmpty(input))
         {
-            System.Diagnostics.Debug.WriteLine("Phone Validation Failed (Empty)");
             return false;
         }
 
@@ -340,125 +365,65 @@ class Program
         //exactly 10 digits
         if (cleanedInput.Length == 10)
         {
-            System.Diagnostics.Debug.WriteLine("Phone Validation Passed");
             return true;
         }
 
-        System.Diagnostics.Debug.WriteLine("Phone Validation Failed");
         return false;
     }
     #endregion
 
-    static void FindStudentMenu()
+    struct Student
     {
-        Scroll("Find From:");
-        Scroll(
-        "\n\t1) ID" +
-        "\n\t2) Phone Number" +
-        "\n\t3) Course Name"
-        );
-
-        int input = SafeIntInput("> ", 1, 3);
-
-        switch (input)
-        {
-            case 1: //ID
-                FindStudent(SafeIntInput("ID: ", 10000000, 99999999));
-                break;
-            case 2: //Phone Number
-                //FindStudent(Convert.ToInt64(SafeIntInput("ID: ", 1000000000, 9999999999)));
-                break;
-            case 3: //Course Name
-                //Console.WriteLine("Wednesday");
-                break;
-        }
+        public string Forename;
+        public string Lastname;
+        public int ID;
+        public int contactNumber;
+        public List<Department> EnrolledDepartments;
     }
 
     #region Find Student
 
-    static void FindStudent(int ID)
+    static Student FindStudent_ID(int ID)
     {
         foreach (var Student in AllStudents)
         {
             if (ID == Student.ID)
             {
-                DisplayStudent(Student);
+                return Student;
             }
         }
+        return new Student();
     }
-    static void FindStudent(long contactNumber)
+    static Student FindStudent_Contact(int contactNumber)
     {
         foreach (var Student in AllStudents)
         {
             if (contactNumber == Student.contactNumber)
             {
-                DisplayStudent(Student);
+                return Student;
             }
         }
+        return new Student();
     }
 
-    static void FindStudent(string courseName)
+    static void FindStudent_Course(string courseName)
     {
-        Course d = FindCourseByName(courseName);
-        AllStudentsInCourse(d);
+        Console.Write(
+        @"  _____  ______ _____    _______     _______ _______ ______ __  __ " + "\n" +
+        @" |  __ \|  ____/ ____|  / ____\ \   / / ____|__   __|  ____|  \/  |" + "\n" +
+        @" | |__) | |__ | |  __  | (___  \ \_/ / (___    | |  | |__  | \  / |" + "\n" +
+        @" |  _  /|  __|| | |_ |  \___ \  \   / \___ \   | |  |  __| | |\/| |" + "\n" +
+        @" | | \ \| |___| |__| |  ____) |  | |  ____) |  | |  | |____| |  | |" + "\n" +
+        @" |_|  \_\______\_____| |_____/   |_| |_____/   |_|  |______|_|  |_|" + "\n\n"
+        );
+        Console.WriteLine(
+            "\n\t1) View all courses" +
+            "\n\t2) Search for student" + //phone, id or course name
+            "\n\t3) Display all students from course" + //"-	Display all student IDs, first names, last names, based on course" 
+            "\n\t4) Delete student record" +
+            "\n\t5) Update student record");
     }
 
-    #endregion
 }
 
-/*
-blockchain
- made by a mathmetician from the 70s
- legers, 1st and 2nd branches
- magic hashes verifying eachother
- money laundering (monero)
-
- literally the whole point of crypto is hiding income (not tax evasion trust me)
-
-5g
- 4g but faster
- iot
- hacking peoples doorbel
- "smart microwave"
-  cognative dissonance
-   programmers knows it's wank
-   regular people slurp it up
-   botnet
-   hackers go brr
-
-quantum
- a model of comuting ivented by (dead) richard feynman et al, promising to use superposed entanglement between cubits (subatomic)
- deomstrated in a lab, theoretical physisits ate it up
- logic gates to control interactions -> computer?
- usually phosperous & silicon because of resonance and other magic
- need billions, can actually do barely 20
- THEORISTS can use it to sort list
- fourier transform (specialist engineering shit)
- peter schwarz says a working quantum computer could do semi-prime factorisation, semi-descreet (?) SIGNIFICANTLY FASTER than regular computers
- comprimise significant amounts of other garbage 
- biochemistry would benifit massivley from huge sorting
- hadamard gates?
- gordon moore
- if you lose track of the cubits the algorithm just stops
-
-ai
- 3rd gen neural net
- recursive neural net (long-short term memory)
- 2016-2017 it got better (trasformative neural net) qualitive nodes
-  everything caught fire
-  generally learns much faster than long-short
- biocomputing
- cybersecurity
- chinese room thought experiment
- tesla archetecture
-
- protien folding problem
-  predicting the shape of a protien by it's formula
-  stuck on long-short memory
-  went from 20 -> 90%
-  US medical lobbying is 725.1 million USD (Statistica, 2022)
-
-
-
-
-*/
+//https://patorjk.com/software/taag/#p=display&f=Big&t=REG%20SYSTEM

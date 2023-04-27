@@ -220,31 +220,34 @@ class Program
 
     static void DisplayStudent(Student s)
     {
+        if (EqualityComparer<Student>.Default.Equals(s, default(Student)))
+        {
+            Scroll("(None found)");
+            return;
+        }
+
         Scroll("----------------------", finishTime: 0);
         Scroll(s.Forename + " " + s.Lastname, finishTime:0);
         Scroll("ID:\t" + s.ID.ToString(), finishTime: 0);
         Scroll("PHN:\t" + s.contactNumber.ToString(), finishTime: 0);
         Scroll("Enrolled Courses:", finishTime: 0);
 
-        try
+
+        
+
+        if (s.EnrolledCourses.Count == 0)
         {
-            if (s.EnrolledCourses.Count == 0)
-            {
-                Scroll("(None found)");
-            }
-            else
-            {
-                foreach (var Course in s.EnrolledCourses)
-                {
-                    Scroll("- " + Course.CourseName, finishTime: 0);
-                }
-            }
-            Scroll("----------------------", finishTime: 0);
+            Scroll("(No courses found)");
         }
-        catch
+        else
         {
-            Scroll("(None found)");
+            foreach (var Course in s.EnrolledCourses)
+            {
+                Scroll("- " + Course.CourseName, finishTime: 0);
+            }
         }
+        Scroll("----------------------", finishTime: 0);
+
     }
 
     static void DeleteStudent(Student s) {

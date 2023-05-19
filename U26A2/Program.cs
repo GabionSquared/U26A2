@@ -546,6 +546,7 @@ class Program
                 return default;
         }
     }
+
     static Student FindStudent_ID(ulong ID)
     {
         foreach (var Student in AllStudents)
@@ -557,6 +558,45 @@ class Program
         }
         return new Student();
     }
+
+    static Student FindStudent_ID1(ulong ID)
+    {
+        //bubblesort
+        for (int write = 0; write < AllStudents.Count; write++)
+        {
+            for (int sort = 0; sort < AllStudents.Count - 1; sort++)
+            {
+                if (AllStudents.ElementAt(sort) > AllStudents.ElementAt(sort + 1))
+                {
+                    Student tmp = AllStudents.ElementAt(sort + 1);
+                    AllStudents.ElementAt(sort + 1) = AllStudents.ElementAt(sort);
+                    AllStudents.ElementAt(sort) = tmp;
+                }
+            }
+        }
+
+        //binary search
+        int min = 0;
+        int max = AllStudents.Count - 1;
+        while (min <= max)
+        {
+            int mid = (min + max) / 2;
+            if (ID == AllStudents.ElementAt(mid).ID)
+            {
+                return AllStudents.ElementAt(mid);
+            }
+            else if (ID < AllStudents.ElementAt(mid).ID)
+            {
+                max = mid - 1;
+            }
+            else
+            {
+                min = mid + 1;
+            }
+        }
+        return new Student();
+    }
+
     static Student FindStudent_Contact(ulong contactNumber)
     {
         foreach (var Student in AllStudents)

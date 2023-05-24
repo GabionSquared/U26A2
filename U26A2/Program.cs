@@ -220,7 +220,7 @@ class Program
 
     static void DisplayStudent(Student s)
     {
-        if (EqualityComparer<Student>.Default.Equals(s, default(Student)))
+        if (EqualityComparer<Student>.Default.Equals(s, default))
         {
             Scroll("(None found)");
             return;
@@ -260,13 +260,13 @@ class Program
         //list.remove(T item) wasn't working, i think it's a pass by reference/item issue.
         //there SHOULD only be 1 student for each id anyway. that's the point.
 
-        System.Diagnostics.Debug.WriteLine("-------------");
-        System.Diagnostics.Debug.WriteLine("looking for: " + s.Forename);
+        Debug.WriteLine("-------------");
+        Debug.WriteLine("looking for: " + s.Forename);
 
 
         foreach (var student in AllStudents)
         {
-            System.Diagnostics.Debug.WriteLine(student.Forename);
+            Debug.WriteLine(student.Forename);
             if(s.ID == student.ID)
             {
                 AllStudents.Remove(student);
@@ -275,10 +275,10 @@ class Program
         }
         /*
         int i = AllStudents.IndexOf(s);
-        System.Diagnostics.Debug.WriteLine(i);
+        Debug.WriteLine(i);
         AllStudents.RemoveAt(i);
         */
-        System.Diagnostics.Debug.WriteLine("-------------");
+        Debug.WriteLine("-------------");
     }
 
     static void UpdateStudent(Student s)
@@ -348,13 +348,13 @@ class Program
     {
         if (string.IsNullOrEmpty(input))
         {
-            System.Diagnostics.Debug.WriteLine("String Validation Failed (Empty)");
+            Debug.WriteLine("String Validation Failed (Empty)");
             return false;
         }
 
         if (input.Contains(' '))
         {
-            System.Diagnostics.Debug.WriteLine("String Validation Failed (Contains Whitespace)");
+            Debug.WriteLine("String Validation Failed (Contains Whitespace)");
             return false;
         }
 
@@ -362,11 +362,11 @@ class Program
         {
             if (!char.IsLetter(c))
             {
-                System.Diagnostics.Debug.WriteLine("String Validation Failed (Contains Non-Letter Characters)");
+                Debug.WriteLine("String Validation Failed (Contains Non-Letter Characters)");
                 return false;
             }
         }
-        System.Diagnostics.Debug.WriteLine("String Validation Passed");
+        Debug.WriteLine("String Validation Passed");
         return true;
     }
     static string SafeStrInput(string prompt = ">")
@@ -390,7 +390,7 @@ class Program
     {
         if (string.IsNullOrEmpty(input))
         {
-            System.Diagnostics.Debug.WriteLine("Int Validation Failed (Empty)");
+            Debug.WriteLine("Int Validation Failed (Empty)");
             return false;
         }
 
@@ -400,16 +400,16 @@ class Program
             {
                 if(result >= lower && result <= upper)
                 {
-                    System.Diagnostics.Debug.WriteLine("Int & Range Validation Passed");
+                    Debug.WriteLine("Int & Range Validation Passed");
                     return true;
                 }
-                System.Diagnostics.Debug.WriteLine("Int & Range Validation Failed");
+                Debug.WriteLine("Int & Range Validation Failed");
                 return false;
             }
-            System.Diagnostics.Debug.WriteLine("Int Validation Passed");
+            Debug.WriteLine("Int Validation Passed");
             return true;
         }
-        System.Diagnostics.Debug.WriteLine("Int Validation Failed");
+        Debug.WriteLine("Int Validation Failed");
         return false;
     }
     static ulong SafeIntInput(string prompt = ">", ulong? lower = null, ulong? upper = null)
@@ -432,16 +432,22 @@ class Program
     {
         if (string.IsNullOrEmpty(input))
         {
-            System.Diagnostics.Debug.WriteLine("Phone Validation Failed (Empty)");
+            Debug.WriteLine("Phone Validation Failed (Empty)");
             return false;
         }
 
         //removes non-digits incase they put + or whitespace
         string cleanedInput = new(input.Where(char.IsDigit).ToArray());
 
+        if (cleanedInput.Length == 0)
+        {
+            Debug.WriteLine("Phone Validation Failed (no int)");
+            return false;
+        }
+
         if (cleanedInput[0] != '0')
         {
-            System.Diagnostics.Debug.WriteLine("Phone Validation Failed (no 0)");
+            Debug.WriteLine("Phone Validation Failed (no 0)");
             Console.WriteLine("Please start with a 0");
             return false;
         }
@@ -449,11 +455,11 @@ class Program
         //exactly 10 digits
         if (cleanedInput.Length == 11)
         {
-            System.Diagnostics.Debug.WriteLine("Phone Validation Passed");
+            Debug.WriteLine("Phone Validation Passed");
             return true;
         }
 
-        System.Diagnostics.Debug.WriteLine("Phone Validation Failed");
+        Debug.WriteLine("Phone Validation Failed");
         return false;
     }
     static ulong SafePhoneInput(string prompt = ">")
@@ -536,15 +542,14 @@ class Program
 
         ulong input = SafeIntInput("> ", 1,2);
 
-        switch (input)
+        return input switch
         {
-            case 1: //ID
-                return FindStudent_ID(SafeIntInput("ID: ",10000000, 99999999));
-            case 2: //Phone Number
-                return FindStudent_Contact(SafePhoneInput("Contact Number: "));
-            default:
-                return default;
-        }
+            //ID
+            1 => FindStudent_ID(SafeIntInput("ID: ", 10000000, 99999999)),
+            //Phone Number
+            2 => FindStudent_Contact(SafePhoneInput("Contact Number: ")),
+            _ => default,
+        };
     }
 
     static Student FindStudent_ID(ulong ID)
@@ -554,44 +559,6 @@ class Program
             if (ID == Student.ID)
             {
                 return Student;
-            }
-        }
-        return new Student();
-    }
-
-    static Student FindStudent_ID1(ulong ID)
-    {
-        //bubblesort
-        for (int write = 0; write < AllStudents.Count; write++)
-        {
-            for (int sort = 0; sort < AllStudents.Count - 1; sort++)
-            {
-                if (AllStudents.ElementAt(sort) > AllStudents.ElementAt(sort + 1))
-                {
-                    Student tmp = AllStudents.ElementAt(sort + 1);
-                    AllStudents.ElementAt(sort + 1) = AllStudents.ElementAt(sort);
-                    AllStudents.ElementAt(sort) = tmp;
-                }
-            }
-        }
-
-        //binary search
-        int min = 0;
-        int max = AllStudents.Count - 1;
-        while (min <= max)
-        {
-            int mid = (min + max) / 2;
-            if (ID == AllStudents.ElementAt(mid).ID)
-            {
-                return AllStudents.ElementAt(mid);
-            }
-            else if (ID < AllStudents.ElementAt(mid).ID)
-            {
-                max = mid - 1;
-            }
-            else
-            {
-                min = mid + 1;
             }
         }
         return new Student();
